@@ -1,8 +1,9 @@
+Changes
+lib/Dumpvalue.pm
+LICENSE
+Makefile.PL
 MANIFEST
 README
-LICENSE
-Todo
-Changes
-Makefile.PL
-lib/Dumpvalue.pm
 t/Dumpvalue.t
+t/rt-134441-dumpvalue.t
+Todo
