@@ -12,6 +12,8 @@ BEGIN {
 	$^W = 0;
 }
 
+use lib ("./t/lib");
+use TieOut;
 use Test::More tests => 17;
 
 use_ok( 'Dumpvalue' );
@@ -19,7 +21,6 @@ use_ok( 'Dumpvalue' );
 my $d;
 ok( $d = Dumpvalue->new(), 'create a new Dumpvalue object' );
 
-# RT 134441
 my $out = tie *OUT, 'TieOut';
 select(OUT);
 
@@ -83,21 +84,3 @@ is( $y, "0  'bar'\n1  ''\n",
 is( $y, $x,
     "dumpValues called on array returns same as dumpValue on array ref, last element empty string");
 
-
-package TieOut;
-use overload '"' => sub { "overloaded!" };
-
-sub TIEHANDLE {
-	my $class = shift;
-	bless(\( my $ref), $class);
-}
-
-sub PRINT {
-	my $self = shift;
-	$$self .= join('', @_);
-}
-
-sub read {
-	my $self = shift;
-	return substr($$self, 0, length($$self), '');
-}
