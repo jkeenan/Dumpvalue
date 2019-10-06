@@ -79,7 +79,7 @@ sub dumpValues {
   my $self = shift;
   local %address;
   local $^W=0;
-  (print "undef\n"), return unless defined $_[0];
+  (print "undef\n"), return if (@_ == 1 and not defined $_[0]);
   $self->unwrap(\@_,0);
 }
 

@@ -12,7 +12,7 @@ BEGIN {
 	$^W = 0;
 }
 
-use Test::More qw(no_plan); # tests => 16;
+use Test::More tests => 17;
 
 use_ok( 'Dumpvalue' );
 
@@ -37,49 +37,52 @@ is( $y, $x,
 
 @foobar = (undef, 'bar');
 $d->dumpValue([@foobar]);
-#is( $out->read, "0..1  undef 'bar'\n",
-is( $out->read, "0  undef\n1  'bar'\n",
+$x = $out->read;
+is( $x, "0  undef\n1  'bar'\n",
     'dumpValue worked on array ref, first element undefined' );
 $d->dumpValues(@foobar);
-#is( $out->read, "0..1  undef 'bar'\n",
 $y = $out->read;
-#is( $out->read, "0  undef\n1  'bar'\n",
 is( $y, "0  undef\n1  'bar'\n",
     'dumpValues worked on array, first element undefined' );
+is( $y, $x,
+    "dumpValues called on array returns same as dumpValue on array ref, first element undefined");
 
-#@foobar = ('bar', undef);
-#$d->dumpValue([@foobar]);
-##is( $out->read, "0..1  'bar' undef\n",
-#is( $out->read, "0  'bar'\n1  undef\n",
-#    'dumpValue worked on array ref, last element undefined' );
-#$d->dumpValues(@foobar);
-##is( $out->read, "0..1  'bar' undef'bar'\n",
-#is( $out->read, "0  'bar'\n1  undef 'bar'\n",
-#    'dumpValues worked on array, last element undefined' );
-#
-#@foobar = ('', 'bar');
-#$d->dumpValue([@foobar]);
-#is( $out->read, "0..1  '' 'bar'\n",
-#    'dumpValue worked on array ref, first element empty string' );
-#$d->dumpValues(@foobar);
-#is( $out->read, "0..1  '' 'bar'\n",
-#    'dumpValues worked on array, first element empty string' );
-#
-#@foobar = ('bar', '');
-#$d->dumpValue([@foobar]);
-#is( $out->read, "0..1  'bar' ''\n",
-#    'dumpValue worked on array ref, last element empty string' );
-#$d->dumpValues(@foobar);
-#is( $out->read, "0..1  'bar' ''\n",
-#    'dumpValues worked on array, last element empty string' );
-#
-## dumpValues (the rest of these should be caught by unwrap)
-#$d->dumpValues(undef);
-#is( $out->read, "undef\n", 'dumpValues caught undef value fine' );
-#$d->dumpValues(\@foo);
-#is( $out->read, "0  0..0  'two'\n", 'dumpValues worked on array ref' );
-#$d->dumpValues('one', 'two');
-#is( $out->read, "0..1  'one' 'two'\n", 'dumpValues worked on multiple values' );
+@foobar = ('bar', undef);
+$d->dumpValue([@foobar]);
+$x = $out->read;
+is( $x, "0  'bar'\n1  undef\n",
+    'dumpValue worked on array ref, last element undefined' );
+$d->dumpValues(@foobar);
+$y = $out->read;
+is( $y, "0  'bar'\n1  undef\n",
+    'dumpValues worked on array, last element undefined' );
+is( $y, $x,
+    "dumpValues called on array returns same as dumpValue on array ref, last element undefined");
+
+@foobar = ('', 'bar');
+$d->dumpValue([@foobar]);
+$x = $out->read;
+is( $x, "0  ''\n1  'bar'\n",
+    'dumpValue worked on array ref, first element empty string' );
+$d->dumpValues(@foobar);
+$y = $out->read;
+is( $y, "0  ''\n1  'bar'\n",
+    'dumpValues worked on array, first element empty string' );
+is( $y, $x,
+    "dumpValues called on array returns same as dumpValue on array ref, first element empty string");
+
+@foobar = ('bar', '');
+$d->dumpValue([@foobar]);
+$x = $out->read;
+is( $x, "0  'bar'\n1  ''\n",
+    'dumpValue worked on array ref, last element empty string' );
+$d->dumpValues(@foobar);
+$y = $out->read;
+is( $y, "0  'bar'\n1  ''\n",
+    'dumpValues worked on array, last element empty string' );
+is( $y, $x,
+    "dumpValues called on array returns same as dumpValue on array ref, last element empty string");
+
 
 package TieOut;
 use overload '"' => sub { "overloaded!" };
