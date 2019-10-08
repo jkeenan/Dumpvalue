@@ -29,7 +29,19 @@ select(OUT);
     my @rv = $d->get(@attributes);
     my $expected = [ 0, 1, "auto", 'quote' ];
     is_deeply( \@rv, $expected, "get multiple (default) options correctly" );
+}
 
+{
+    my $d;
+    ok( $d = Dumpvalue->new(), 'create a new Dumpvalue object' );
+    my @foobar = ('foo', 'bar');
+    my @bazlow = ('baz', 'low');
+    {
+        local $@;
+        eval { $d->dumpValue([@foobar], [@bazlow]); };
+        like $@, qr/^usage: \$dumper->dumpValue\(value\)/,
+            "dumpValue() takes only 1 argument";
+    }
 }
 
     
