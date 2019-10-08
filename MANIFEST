@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST
 README
 t/Dumpvalue.t
+t/extend-coverage.t
 t/lib/TieOut.pm
 t/rt-134441-dumpvalue.t
 Todo
