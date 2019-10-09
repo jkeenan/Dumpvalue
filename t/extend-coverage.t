@@ -58,32 +58,32 @@ select(OUT);
 
     my $d = Dumpvalue->new( quoteHighBit => '', unctrl => 'quote' );
     ok( $d, 'create a new Dumpvalue object: quoteHighBit explicitly off' );
-    $x = $d->stringify("\N{U+266}"); 
-    is ($x, "'\N{U+266}'" , 'quoteHighBit off' ); 
+    $x = $d->stringify("\N{U+266}");
+    is ($x, "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $e = Dumpvalue->new( quoteHighBit => 1, unctrl => 'quote' );
     ok( $e, 'create a new Dumpvalue object: quoteHighBit on' );
-    $y = $e->stringify("\N{U+266}"); 
+    $y = $e->stringify("\N{U+266}");
     is( $y, q|'\1146'|, "quoteHighBit on");
 
     my $f = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
     ok( $f, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
-    $x = $f->stringify("\N{U+266}"); 
-    is ($x, "'\N{U+266}'" , 'quoteHighBit off' ); 
+    $x = $f->stringify("\N{U+266}");
+    is ($x, "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $g = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
     ok( $g, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
-    $y = $g->stringify("\N{U+266}"); 
-    is ($y, "'\N{U+266}'" , 'quoteHighBit off' ); 
+    $y = $g->stringify("\N{U+266}");
+    is ($y, "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $h = Dumpvalue->new( quoteHighBit => '', tick => '"' );
     ok( $h, 'create a new Dumpvalue object: quoteHighBit explicitly off, tick quote' );
-    $x = $h->stringify("\N{U+266}"); 
-    is ($x, q|"| . "\N{U+266}" . q|"| , 'quoteHighBit off' ); 
+    $x = $h->stringify("\N{U+266}");
+    is ($x, q|"| . "\N{U+266}" . q|"| , 'quoteHighBit off' );
 
     my $i = Dumpvalue->new( quoteHighBit => 1, tick => '"' );
     ok( $i, 'create a new Dumpvalue object: quoteHighBit on, tick quote' );
-    $y = $i->stringify("\N{U+266}"); 
+    $y = $i->stringify("\N{U+266}");
     is( $y, q|"\1146"|, "quoteHighBit on");
 
 }
