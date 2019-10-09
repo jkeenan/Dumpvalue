@@ -132,14 +132,14 @@ select(OUT);
     like( $y[2], qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+0\.\.0\s+'a'/,
         "DumpElem worked as expected with veryCompact on: array contains ref");
 
-    my $j = Dumpvalue->new( veryCompact => '' );
+    my $j = Dumpvalue->new( veryCompact => '', dumpReused => 1 );
     ok( $j, 'create a new Dumpvalue object: veryCompact explicitly off' );
     $j->DumpElem({ a => 1, b => 2, c => ['a'] });
     $x[3] = $out->read;
     like( $x[3], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\sARRAY\([^)]+\)\n\s+0\s+'a'/,
         "DumpElem worked as expected with veryCompact explicitly off:  hash contains ref");
 
-    my $k = Dumpvalue->new( veryCompact => 1 );
+    my $k = Dumpvalue->new( veryCompact => 1, dumpReused => 1  );
     ok( $k, 'create a new Dumpvalue object: veryCompact on' );
     $k->DumpElem({ a => 1, b => 2, c => ['a'] });
     $y[3] = $out->read;
