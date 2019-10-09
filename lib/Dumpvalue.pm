@@ -266,7 +266,7 @@ sub unwrap {
     for my $num (0 .. $tArrayDepth) {
       return if $DB::signal and $self->{stopDbSignal};
       print "$sp$num  ";
-      if (exists $v->[$num]) {
+      if (defined $v->[$num]) {
         $self->DumpElem($v->[$num], $s);
       } else {
 	print "empty slot\n";

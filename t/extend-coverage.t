@@ -244,11 +244,16 @@ select(OUT);
 {
     my (@x, @y);
 
-    my $d = Dumpvalue->new( compactDump => 1 );
+    my $d = Dumpvalue->new( compactDump => 1, dumpReused => 1 );
     ok( $d, 'create a new Dumpvalue object, compactDump' );
     $d->unwrap([]);
     $x[0] = $out->read;
     like( $x[0], qr/\s*empty array\n/, "unwrap() reported empty array");
+
+    $d->unwrap([ 'foo', undef, 'bar' ]);
+    $x[1] = $out->read;
+    like($x[1], qr/^0\s+'foo'\n1\s+empty slot\n2\s+'bar'/,
+        "unwrap reported empty slot");
 }
 
 __END__
