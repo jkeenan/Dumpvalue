@@ -88,5 +88,93 @@ select(OUT);
 
 }
 
+{
+    my ($x, $y);
+
+    my $d = Dumpvalue->new( veryCompact => '' );
+    ok( $d, 'create a new Dumpvalue object: veryCompact explicitly off' );
+    $d->DumpElem([1, 2, 3]);
+    $x = $out->read;
+    like( $x, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+3/,
+        "DumpElem worked as expected with veryCompact explicitly off");
+
+    my $e = Dumpvalue->new( veryCompact => 1 );
+    ok( $e, 'create a new Dumpvalue object: veryCompact on' );
+    $e->DumpElem([1, 2, 3]);
+    $y = $out->read;
+    like( $y, qr/^0\.\.2\s+1 2 3/,
+        "DumpElem worked as expected with veryCompact on");
+
+    my $f = Dumpvalue->new( veryCompact => '' );
+    $f->DumpElem({ a => 1, b => 2, c => 3 });
+    $x = $out->read;
+    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s3/,
+        "DumpElem worked as expected with veryCompact explicitly off: hashref");
+
+    my $g = Dumpvalue->new( veryCompact => 1 );
+    ok( $g, 'create a new Dumpvalue object: veryCompact on' );
+    $g->DumpElem({ a => 1, b => 2, c => 3 });
+    $y = $out->read;
+    like( $y, qr/^'a'\s=>\s1,\s'b'\s=>\s2,\s'c'\s=>\s3/,
+        "DumpElem worked as expected with veryCompact on: hashref");
+
+    my $h = Dumpvalue->new( veryCompact => '' );
+    ok( $h, 'create a new Dumpvalue object: veryCompact explicitly off' );
+    $h->DumpElem([1, 2, ['a']]);
+    $x = $out->read;
+    like( $x, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+ARRAY\([^)]+\)\n\s+0\s+'a'/,
+        "DumpElem worked as expected with veryCompact explicitly off:  array contains ref");
+
+    my $i = Dumpvalue->new( veryCompact => 1 );
+    ok( $i, 'create a new Dumpvalue object: veryCompact on' );
+    $i->DumpElem([1, 2, ['a']]);
+    $y = $out->read;
+    like( $y, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+0\.\.0\s+'a'/,
+        "DumpElem worked as expected with veryCompact on: array contains ref");
+
+    my $j = Dumpvalue->new( veryCompact => '' );
+    ok( $j, 'create a new Dumpvalue object: veryCompact explicitly off' );
+    $j->DumpElem({ a => 1, b => 2, c => ['a'] });
+    $x = $out->read;
+    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\sARRAY\([^)]+\)\n\s+0\s+'a'/,
+        "DumpElem worked as expected with veryCompact explicitly off:  hash contains ref");
+
+    my $k = Dumpvalue->new( veryCompact => 1 );
+    ok( $k, 'create a new Dumpvalue object: veryCompact on' );
+    $k->DumpElem({ a => 1, b => 2, c => ['a'] });
+    $y = $out->read;
+    like( $y, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s0\.\.0\s+'a'/,
+        "DumpElem worked as expected with veryCompact on:  hash contains ref");
+
+    my $l = Dumpvalue->new( veryCompact => '', hashDepth => 2 );
+    $l->DumpElem({ a => 1, b => 2, c => 3 });
+    $x = $out->read;
+    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n\.{4}/,
+        "DumpElem worked as expected with veryCompact explicitly off: hashref hashdepth");
+
+    my $m = Dumpvalue->new( veryCompact => 1, hashDepth => 2 );
+    ok( $m, 'create a new Dumpvalue object: veryCompact on' );
+    $m->DumpElem({ a => 1, b => 2, c => 3 });
+    $y = $out->read;
+    like( $y, qr/^'a'\s=>\s1,\s'b'\s=>\s2\s\.+/,
+        "DumpElem worked as expected with veryCompact on: hashref hashdepth");
+
+    my $n = Dumpvalue->new( veryCompact => '', hashDepth => 4 );
+    ok( $n, 'create a new Dumpvalue object: veryCompact off' );
+    $n->DumpElem({ a => 1, b => 2, c => 3 });
+    $x = $out->read;
+    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s+=>\s+3/,
+        "DumpElem worked as expected with veryCompact explicitly off: hashref hashdepth");
+
+    my $o = Dumpvalue->new( veryCompact => 1, hashDepth => 4 );
+    ok( $o, 'create a new Dumpvalue object: veryCompact on' );
+    $o->DumpElem({ a => 1, b => 2, c => 3 });
+    $y = $out->read;
+    like( $y, qr/^'a'\s=>\s1,\s+'b'\s=>\s2,\s+'c'\s+=>\s+3/,
+        "DumpElem worked as expected with veryCompact on: hashref hashdepth");
+
+}
 __END__
+    print STDERR "AAA: $x\n";
+    print STDERR "AAA: $y\n";
 
