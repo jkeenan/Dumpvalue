@@ -15,6 +15,7 @@ BEGIN {
 use lib ("./t/lib");
 use TieOut;
 use Test::More qw(no_plan); # tests => 17;
+use List::Util qw( sum );
 
 use_ok( 'Dumpvalue' );
 
@@ -172,7 +173,59 @@ select(OUT);
     $y = $out->read;
     like( $y, qr/^'a'\s=>\s1,\s+'b'\s=>\s2,\s+'c'\s+=>\s+3/,
         "DumpElem worked as expected with veryCompact on: hashref hashdepth");
+}
 
+{
+    my ($x, $y);
+    my $five = '12345';
+    my $six = '123456';
+    my $alt = '78901';
+    my @arr = ($six, $alt);
+    my %two = (first => $six, notthefirst => $alt);
+
+    my $d = Dumpvalue->new( usageOnly => '' );
+    ok( $d, 'create a new Dumpvalue object: usageOnly explicitly off' );
+    $x = $d->scalarUsage($five);
+    is( $x, length($five), 'scalarUsage reports length correctly' );
+
+    my $e = Dumpvalue->new( usageOnly => 1 );
+    ok( $e, 'create a new Dumpvalue object: usageOnly on' );
+    $y = $e->scalarUsage($five);
+    is( $y, length($five), 'scalarUsage reports length correctly' );
+
+    my $f = Dumpvalue->new( usageOnly => '' );
+    ok( $f, 'create a new Dumpvalue object: usageOnly explicitly off' );
+    $x = $f->scalarUsage($six, '7890');
+    is ($x, length($six), 'scalarUsage reports length of first element correctly' );
+
+    my $g = Dumpvalue->new( usageOnly => 1 );
+    ok( $g, 'create a new Dumpvalue object: usageOnly on' );
+    $y = $g->scalarUsage($six, '7890');
+    is ($y, length($six), 'scalarUsage reports length of first element correctly' );
+
+    my $h = Dumpvalue->new( usageOnly => '' );
+    ok( $h, 'create a new Dumpvalue object: usageOnly explicitly off' );
+    $x = $h->scalarUsage( [ @arr ] );
+    is ($x, sum( map { length($_) } @arr ),
+        'scalarUsage reports sum of length of array elements correctly' );
+
+    my $i = Dumpvalue->new( usageOnly => 1 );
+    ok( $i, 'create a new Dumpvalue object: usageOnly on' );
+    $y = $i->scalarUsage( [ @arr ] );
+    is ($y, sum( map { length($_) } @arr ),
+        'scalarUsage reports length of first element correctly' );
+
+    my $j = Dumpvalue->new( usageOnly => '' );
+    ok( $j, 'create a new Dumpvalue object: usageOnly explicitly off' );
+    $x = $j->scalarUsage( { %two } );
+    is ($x, sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
+        'scalarUsage reports sum of length of hash keys and values correctly' );
+
+    my $k = Dumpvalue->new( usageOnly => 1 );
+    ok( $k, 'create a new Dumpvalue object: usageOnly on' );
+    $y = $k->scalarUsage( { %two } );
+    is ($y, sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
+        'scalarUsage reports sum of length of hash keys and values correctly' );
 }
 __END__
     print STDERR "AAA: $x\n";
