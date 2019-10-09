@@ -55,128 +55,128 @@ select(OUT);
 
 
 {
-    my ($x, $y);
+    my (@x, @y);
 
     my $d = Dumpvalue->new( quoteHighBit => '', unctrl => 'quote' );
     ok( $d, 'create a new Dumpvalue object: quoteHighBit explicitly off' );
-    $x = $d->stringify("\N{U+266}");
-    is ($x, "'\N{U+266}'" , 'quoteHighBit off' );
+    $x[0] = $d->stringify("\N{U+266}");
+    is ($x[0], "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $e = Dumpvalue->new( quoteHighBit => 1, unctrl => 'quote' );
     ok( $e, 'create a new Dumpvalue object: quoteHighBit on' );
-    $y = $e->stringify("\N{U+266}");
-    is( $y, q|'\1146'|, "quoteHighBit on");
+    $y[0] = $e->stringify("\N{U+266}");
+    is( $y[0], q|'\1146'|, "quoteHighBit on");
 
     my $f = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
     ok( $f, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
-    $x = $f->stringify("\N{U+266}");
-    is ($x, "'\N{U+266}'" , 'quoteHighBit off' );
+    $x[1] = $f->stringify("\N{U+266}");
+    is ($x[1], "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $g = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
     ok( $g, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
-    $y = $g->stringify("\N{U+266}");
-    is ($y, "'\N{U+266}'" , 'quoteHighBit off' );
+    $y[1] = $g->stringify("\N{U+266}");
+    is ($y[1], "'\N{U+266}'" , 'quoteHighBit off' );
 
     my $h = Dumpvalue->new( quoteHighBit => '', tick => '"' );
     ok( $h, 'create a new Dumpvalue object: quoteHighBit explicitly off, tick quote' );
-    $x = $h->stringify("\N{U+266}");
-    is ($x, q|"| . "\N{U+266}" . q|"| , 'quoteHighBit off' );
+    $x[2] = $h->stringify("\N{U+266}");
+    is ($x[2], q|"| . "\N{U+266}" . q|"| , 'quoteHighBit off' );
 
     my $i = Dumpvalue->new( quoteHighBit => 1, tick => '"' );
     ok( $i, 'create a new Dumpvalue object: quoteHighBit on, tick quote' );
-    $y = $i->stringify("\N{U+266}");
-    is( $y, q|"\1146"|, "quoteHighBit on");
-
+    $y[2] = $i->stringify("\N{U+266}");
+    is( $y[2], q|"\1146"|, "quoteHighBit on");
 }
 
 {
-    my ($x, $y);
+    my (@x, @y);
 
     my $d = Dumpvalue->new( veryCompact => '' );
     ok( $d, 'create a new Dumpvalue object: veryCompact explicitly off' );
     $d->DumpElem([1, 2, 3]);
-    $x = $out->read;
-    like( $x, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+3/,
+    $x[0] = $out->read;
+    like( $x[0], qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+3/,
         "DumpElem worked as expected with veryCompact explicitly off");
 
     my $e = Dumpvalue->new( veryCompact => 1 );
     ok( $e, 'create a new Dumpvalue object: veryCompact on' );
     $e->DumpElem([1, 2, 3]);
-    $y = $out->read;
-    like( $y, qr/^0\.\.2\s+1 2 3/,
+    $y[0] = $out->read;
+    like( $y[0], qr/^0\.\.2\s+1 2 3/,
         "DumpElem worked as expected with veryCompact on");
 
     my $f = Dumpvalue->new( veryCompact => '' );
     $f->DumpElem({ a => 1, b => 2, c => 3 });
-    $x = $out->read;
-    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s3/,
+    $x[1] = $out->read;
+    like( $x[1], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s3/,
         "DumpElem worked as expected with veryCompact explicitly off: hashref");
 
     my $g = Dumpvalue->new( veryCompact => 1 );
     ok( $g, 'create a new Dumpvalue object: veryCompact on' );
     $g->DumpElem({ a => 1, b => 2, c => 3 });
-    $y = $out->read;
-    like( $y, qr/^'a'\s=>\s1,\s'b'\s=>\s2,\s'c'\s=>\s3/,
+    $y[1] = $out->read;
+    like( $y[1], qr/^'a'\s=>\s1,\s'b'\s=>\s2,\s'c'\s=>\s3/,
         "DumpElem worked as expected with veryCompact on: hashref");
 
     my $h = Dumpvalue->new( veryCompact => '' );
     ok( $h, 'create a new Dumpvalue object: veryCompact explicitly off' );
     $h->DumpElem([1, 2, ['a']]);
-    $x = $out->read;
-    like( $x, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+ARRAY\([^)]+\)\n\s+0\s+'a'/,
+    $x[2] = $out->read;
+    like( $x[2], qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+ARRAY\([^)]+\)\n\s+0\s+'a'/,
         "DumpElem worked as expected with veryCompact explicitly off:  array contains ref");
 
     my $i = Dumpvalue->new( veryCompact => 1 );
     ok( $i, 'create a new Dumpvalue object: veryCompact on' );
     $i->DumpElem([1, 2, ['a']]);
-    $y = $out->read;
-    like( $y, qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+0\.\.0\s+'a'/,
+    $y[2] = $out->read;
+    like( $y[2], qr/^ARRAY\([^)]+\)\n0\s+1\n1\s+2\n2\s+0\.\.0\s+'a'/,
         "DumpElem worked as expected with veryCompact on: array contains ref");
 
     my $j = Dumpvalue->new( veryCompact => '' );
     ok( $j, 'create a new Dumpvalue object: veryCompact explicitly off' );
     $j->DumpElem({ a => 1, b => 2, c => ['a'] });
-    $x = $out->read;
-    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\sARRAY\([^)]+\)\n\s+0\s+'a'/,
+    $x[3] = $out->read;
+    like( $x[3], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\sARRAY\([^)]+\)\n\s+0\s+'a'/,
         "DumpElem worked as expected with veryCompact explicitly off:  hash contains ref");
 
     my $k = Dumpvalue->new( veryCompact => 1 );
     ok( $k, 'create a new Dumpvalue object: veryCompact on' );
     $k->DumpElem({ a => 1, b => 2, c => ['a'] });
-    $y = $out->read;
-    like( $y, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s0\.\.0\s+'a'/,
+    $y[3] = $out->read;
+    like( $y[3], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s=>\s0\.\.0\s+'a'/,
         "DumpElem worked as expected with veryCompact on:  hash contains ref");
 
     my $l = Dumpvalue->new( veryCompact => '', hashDepth => 2 );
     $l->DumpElem({ a => 1, b => 2, c => 3 });
-    $x = $out->read;
-    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n\.{4}/,
+    $x[4] = $out->read;
+    like( $x[4], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n\.{4}/,
         "DumpElem worked as expected with veryCompact explicitly off: hashref hashdepth");
 
     my $m = Dumpvalue->new( veryCompact => 1, hashDepth => 2 );
     ok( $m, 'create a new Dumpvalue object: veryCompact on' );
     $m->DumpElem({ a => 1, b => 2, c => 3 });
-    $y = $out->read;
-    like( $y, qr/^'a'\s=>\s1,\s'b'\s=>\s2\s\.+/,
+    $y[4] = $out->read;
+    like( $y[4], qr/^'a'\s=>\s1,\s'b'\s=>\s2\s\.+/,
         "DumpElem worked as expected with veryCompact on: hashref hashdepth");
 
     my $n = Dumpvalue->new( veryCompact => '', hashDepth => 4 );
     ok( $n, 'create a new Dumpvalue object: veryCompact off' );
     $n->DumpElem({ a => 1, b => 2, c => 3 });
-    $x = $out->read;
-    like( $x, qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s+=>\s+3/,
+    $x[5] = $out->read;
+    like( $x[5], qr/^HASH\([^)]+\)\n'a'\s=>\s1\n'b'\s=>\s2\n'c'\s+=>\s+3/,
         "DumpElem worked as expected with veryCompact explicitly off: hashref hashdepth");
 
     my $o = Dumpvalue->new( veryCompact => 1, hashDepth => 4 );
     ok( $o, 'create a new Dumpvalue object: veryCompact on' );
     $o->DumpElem({ a => 1, b => 2, c => 3 });
-    $y = $out->read;
-    like( $y, qr/^'a'\s=>\s1,\s+'b'\s=>\s2,\s+'c'\s+=>\s+3/,
+    $y[5] = $out->read;
+    like( $y[5], qr/^'a'\s=>\s1,\s+'b'\s=>\s2,\s+'c'\s+=>\s+3/,
         "DumpElem worked as expected with veryCompact on: hashref hashdepth");
 }
 
 {
-    my ($x, $y);
+    my (@x, @y);
+
     my $five = '12345';
     my $six = '123456';
     my $alt = '78901';
@@ -185,48 +185,50 @@ select(OUT);
 
     my $d = Dumpvalue->new( usageOnly => '' );
     ok( $d, 'create a new Dumpvalue object: usageOnly explicitly off' );
-    $x = $d->scalarUsage($five);
-    is( $x, length($five), 'scalarUsage reports length correctly' );
+    $x[0] = $d->scalarUsage($five);
+    is( $x[0], length($five), 'scalarUsage reports length correctly' );
 
     my $e = Dumpvalue->new( usageOnly => 1 );
     ok( $e, 'create a new Dumpvalue object: usageOnly on' );
-    $y = $e->scalarUsage($five);
-    is( $y, length($five), 'scalarUsage reports length correctly' );
+    $y[0] = $e->scalarUsage($five);
+    is( $y[0], length($five), 'scalarUsage reports length correctly' );
 
     my $f = Dumpvalue->new( usageOnly => '' );
     ok( $f, 'create a new Dumpvalue object: usageOnly explicitly off' );
-    $x = $f->scalarUsage($six, '7890');
-    is ($x, length($six), 'scalarUsage reports length of first element correctly' );
+    $x[1] = $f->scalarUsage($six, '7890');
+    is ($x[1], length($six), 'scalarUsage reports length of first element correctly' );
 
     my $g = Dumpvalue->new( usageOnly => 1 );
     ok( $g, 'create a new Dumpvalue object: usageOnly on' );
-    $y = $g->scalarUsage($six, '7890');
-    is ($y, length($six), 'scalarUsage reports length of first element correctly' );
+    $y[1] = $g->scalarUsage($six, '7890');
+    is ($y[1], length($six), 'scalarUsage reports length of first element correctly' );
 
     my $h = Dumpvalue->new( usageOnly => '' );
     ok( $h, 'create a new Dumpvalue object: usageOnly explicitly off' );
-    $x = $h->scalarUsage( [ @arr ] );
-    is ($x, sum( map { length($_) } @arr ),
+    $x[2] = $h->scalarUsage( [ @arr ] );
+    is ($x[2], sum( map { length($_) } @arr ),
         'scalarUsage reports sum of length of array elements correctly' );
 
     my $i = Dumpvalue->new( usageOnly => 1 );
     ok( $i, 'create a new Dumpvalue object: usageOnly on' );
-    $y = $i->scalarUsage( [ @arr ] );
-    is ($y, sum( map { length($_) } @arr ),
+    $y[2] = $i->scalarUsage( [ @arr ] );
+    is ($y[2], sum( map { length($_) } @arr ),
         'scalarUsage reports length of first element correctly' );
 
     my $j = Dumpvalue->new( usageOnly => '' );
     ok( $j, 'create a new Dumpvalue object: usageOnly explicitly off' );
-    $x = $j->scalarUsage( { %two } );
-    is ($x, sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
+    $x[3] = $j->scalarUsage( { %two } );
+    is ($x[3], sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
         'scalarUsage reports sum of length of hash keys and values correctly' );
 
     my $k = Dumpvalue->new( usageOnly => 1 );
     ok( $k, 'create a new Dumpvalue object: usageOnly on' );
-    $y = $k->scalarUsage( { %two } );
-    is ($y, sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
+    $y[3] = $k->scalarUsage( { %two } );
+    is ($y[3], sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
         'scalarUsage reports sum of length of hash keys and values correctly' );
 }
+
+
 __END__
     print STDERR "AAA: $x\n";
     print STDERR "AAA: $y\n";
