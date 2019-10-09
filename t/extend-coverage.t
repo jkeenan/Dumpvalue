@@ -241,6 +241,15 @@ select(OUT);
 #
 #}
 
+{
+    my (@x, @y);
+
+    my $d = Dumpvalue->new( compactDump => 1 );
+    ok( $d, 'create a new Dumpvalue object, compactDump' );
+    $d->unwrap([]);
+    $x[0] = $out->read;
+    like( $x[0], qr/\s*empty array\n/, "unwrap() reported empty array");
+}
 
 __END__
     print STDERR "AAA: $x\n";
