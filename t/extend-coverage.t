@@ -23,8 +23,8 @@ my $out = tie *OUT, 'TieOut';
 select(OUT);
 
 {
-    my $d;
-    ok( $d = Dumpvalue->new(), 'create a new Dumpvalue object' );
+    my $d = Dumpvalue->new();
+    ok( $d, 'create a new Dumpvalue object' );
     is( $d->get('globPrint'), 0, 'get a single (default) option correctly' );
     my @attributes = (qw|globPrint printUndef tick unctrl|);
     my @rv = $d->get(@attributes);
@@ -227,6 +227,19 @@ select(OUT);
     is ($y[3], sum( ( map { length($_) } keys %two ), ( map { length($_) } values %two ), ),
         'scalarUsage reports sum of length of hash keys and values correctly' );
 }
+
+#{
+#
+#    use warnings;
+#    my (@x, @y);
+#
+#    my $d = Dumpvalue->new();
+#    ok( $d, 'create a new Dumpvalue object' );
+#    #$x[0] = $d->dumpvars( 'main' );
+#    $d->dumpvars( 'main' );
+#    #print STDERR "AAA: $x[0]\n";
+#
+#}
 
 
 __END__
