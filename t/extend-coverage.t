@@ -44,71 +44,49 @@ select(OUT);
     }
 }
 
-    
+{
+    my $d;
+    ok( $d = Dumpvalue->new(), 'create a new Dumpvalue object' );
+    #is( $d->stringify(), 'undef', 'stringify handles undef okay' );
+    # Need to create a "stringify-overloaded object", then test with
+    # non-default value 'bareStringify = 0'.
+}
+
+
+{
+    my ($x, $y);
+
+    my $d = Dumpvalue->new( quoteHighBit => '', unctrl => 'quote' );
+    ok( $d, 'create a new Dumpvalue object: quoteHighBit explicitly off' );
+    $x = $d->stringify("\N{U+266}"); 
+    is ($x, "'\N{U+266}'" , 'quoteHighBit off' ); 
+
+    my $e = Dumpvalue->new( quoteHighBit => 1, unctrl => 'quote' );
+    ok( $e, 'create a new Dumpvalue object: quoteHighBit on' );
+    $y = $e->stringify("\N{U+266}"); 
+    is( $y, q|'\1146'|, "quoteHighBit on");
+
+    my $f = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
+    ok( $f, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
+    $x = $f->stringify("\N{U+266}"); 
+    is ($x, "'\N{U+266}'" , 'quoteHighBit off' ); 
+
+    my $g = Dumpvalue->new( quoteHighBit => '', unctrl => 'unctrl' );
+    ok( $g, 'create a new Dumpvalue object: quoteHighBit explicitly off, unctrl' );
+    $y = $g->stringify("\N{U+266}"); 
+    is ($y, "'\N{U+266}'" , 'quoteHighBit off' ); 
+
+    my $h = Dumpvalue->new( quoteHighBit => '', tick => '"' );
+    ok( $h, 'create a new Dumpvalue object: quoteHighBit explicitly off, tick quote' );
+    $x = $h->stringify("\N{U+266}"); 
+    is ($x, q|"| . "\N{U+266}" . q|"| , 'quoteHighBit off' ); 
+
+    my $i = Dumpvalue->new( quoteHighBit => 1, tick => '"' );
+    ok( $i, 'create a new Dumpvalue object: quoteHighBit on, tick quote' );
+    $y = $i->stringify("\N{U+266}"); 
+    is( $y, q|"\1146"|, "quoteHighBit on");
+
+}
 
 __END__
-
-        globPrint          => 0,
-        printUndef          => 1,
-        tick              => "auto",
-        unctrl              => 'quote',
-my (@foobar, $x, $y);
-
-@foobar = ('foo', 'bar');
-$d->dumpValue([@foobar]);
-$x = $out->read;
-is( $x, "0  'foo'\n1  'bar'\n", 'dumpValue worked on array ref' );
-$d->dumpValues(@foobar);
-$y = $out->read;
-is( $y, "0  'foo'\n1  'bar'\n", 'dumpValues worked on array' );
-is( $y, $x,
-    "dumpValues called on array returns same as dumpValue on array ref");
-
-@foobar = (undef, 'bar');
-$d->dumpValue([@foobar]);
-$x = $out->read;
-is( $x, "0  undef\n1  'bar'\n",
-    'dumpValue worked on array ref, first element undefined' );
-$d->dumpValues(@foobar);
-$y = $out->read;
-is( $y, "0  undef\n1  'bar'\n",
-    'dumpValues worked on array, first element undefined' );
-is( $y, $x,
-    "dumpValues called on array returns same as dumpValue on array ref, first element undefined");
-
-@foobar = ('bar', undef);
-$d->dumpValue([@foobar]);
-$x = $out->read;
-is( $x, "0  'bar'\n1  undef\n",
-    'dumpValue worked on array ref, last element undefined' );
-$d->dumpValues(@foobar);
-$y = $out->read;
-is( $y, "0  'bar'\n1  undef\n",
-    'dumpValues worked on array, last element undefined' );
-is( $y, $x,
-    "dumpValues called on array returns same as dumpValue on array ref, last element undefined");
-
-@foobar = ('', 'bar');
-$d->dumpValue([@foobar]);
-$x = $out->read;
-is( $x, "0  ''\n1  'bar'\n",
-    'dumpValue worked on array ref, first element empty string' );
-$d->dumpValues(@foobar);
-$y = $out->read;
-is( $y, "0  ''\n1  'bar'\n",
-    'dumpValues worked on array, first element empty string' );
-is( $y, $x,
-    "dumpValues called on array returns same as dumpValue on array ref, first element empty string");
-
-@foobar = ('bar', '');
-$d->dumpValue([@foobar]);
-$x = $out->read;
-is( $x, "0  'bar'\n1  ''\n",
-    'dumpValue worked on array ref, last element empty string' );
-$d->dumpValues(@foobar);
-$y = $out->read;
-is( $y, "0  'bar'\n1  ''\n",
-    'dumpValues worked on array, last element empty string' );
-is( $y, $x,
-    "dumpValues called on array returns same as dumpValue on array ref, last element empty string");
 
