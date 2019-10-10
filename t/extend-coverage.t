@@ -251,6 +251,23 @@ select(OUT);
     like( $x[0], qr/\s*empty array\n/, "unwrap() reported empty array");
 }
 
+{
+    my (@x, @y);
+    my $d = Dumpvalue->new();
+    ok( $d, 'create a new Dumpvalue object' );
+    $d->unwrap(\*BAR);
+    $x[0] = $out->read;
+    is( $x[0], "-> *main::BAR\n", "unwrap reported ref to typeglob");
+
+    my $e = Dumpvalue->new( globPrint => 1 );
+    ok( $e, 'create a new Dumpvalue object, globPrint' );
+    $e->unwrap(\*RQP);
+    $y[0] = $out->read;
+    is( $y[0], "-> *main::RQP\n", "unwrap reported ref to typeglob");
+
+}
+
+
 __END__
     print STDERR "AAA: $x\n";
     print STDERR "AAA: $y\n";
