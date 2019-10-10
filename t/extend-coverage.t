@@ -251,6 +251,21 @@ select(OUT);
     $d->unwrap([]);
     $x[0] = $out->read;
     like( $x[0], qr/\s*empty array\n/, "unwrap() reported empty array");
+
+    my $e = Dumpvalue->new( compactDump => 0 );
+    ok( $e, 'create a new Dumpvalue object, compactDump explicitly off' );
+    $e->unwrap([ qw| alpha beta gamma | ]);
+    $y[0] = $out->read;
+    like( $y[0], qr/0\s+'alpha'\n1\s+'beta'\n2\s+'gamma'/,
+        "unwrap() with compactDump explicitly off");
+
+    my $f = Dumpvalue->new();
+    ok( $f, 'create a new Dumpvalue object' );
+    $f->veryCompact(0);
+    $f->unwrap([ qw| alpha beta gamma | ]);
+    $x[1] = $out->read;
+    like( $x[1], qr/0\s+'alpha'\n1\s+'beta'\n2\s+'gamma'/,
+        "unwrap() after veryCompact method call with explicitly off");
 }
 
 {
@@ -283,6 +298,6 @@ select(OUT);
 
 
 __END__
-    print STDERR "AAA: $x\n";
-    print STDERR "AAA: $y\n";
+    print STDERR "AAA: $x[0]\n";
+    print STDERR "AAA: $y[0]\n";
 
