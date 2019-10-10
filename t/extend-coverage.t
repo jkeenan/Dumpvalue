@@ -16,6 +16,8 @@ use lib ("./t/lib");
 use TieOut;
 use Test::More qw(no_plan); # tests => 17;
 use List::Util qw( sum );
+use File::Temp qw( tempfile tempdir );
+use File::Spec;
 
 use_ok( 'Dumpvalue' );
 
@@ -265,6 +267,18 @@ select(OUT);
     $y[0] = $out->read;
     is( $y[0], "-> *main::RQP\n", "unwrap reported ref to typeglob");
 
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $tempfile = File::Spec->catfile($tdir, 'foo.txt');
+    open FH, '>', $tempfile or die "Unable to open tempfile for writing";
+    print FH "\n";
+    my $f = Dumpvalue->new( dumpReused => 1 );
+    ok( $f, 'create a new Dumpvalue object' );
+    $f->unwrap(\*FH);
+    $x[1] = $out->read;
+    like( $x[1],
+        qr/->\s\*main::FH\n\s*FileHandle\(\{\*main::FH\}\)\s+=>\s+fileno\(\d+\)\n/,
+        "unwrap reported ref to typeglob");
+    close FH or die "Unable to close tempfile after writing";
 }
 
 
