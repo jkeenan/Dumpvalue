@@ -372,12 +372,21 @@ select(OUT);
 
 {
     my (@x, @y);
-    my $d = Dumpvalue->new( dumpReused => 1 );
+
+    my $d = Dumpvalue->new( dumpReused => 1, quoteHighBit => '' );
     ok( $d, 'create a new Dumpvalue object' );
     $d->set_unctrl('unctrl');
     $d->unwrap([ "bo\007nd", qw| alpha beta gamma | ]);
     $x[0] = $out->read;
     like( $x[0], qr/0\s+"bo\^.nd"\n1\s+'alpha'\n2\s+'beta'\n3\s+'gamma'/,
+        "unwrap() with set_unctrl('unctrl') method call" );
+
+    my $e = Dumpvalue->new( dumpReused => 1, quoteHighBit => 1 );
+    ok( $e, 'create a new Dumpvalue object' );
+    $e->set_unctrl('unctrl');
+    $e->unwrap([ "bo\007nd", qw| alpha beta gamma | ]);
+    $x[1] = $out->read;
+    like( $x[1], qr/0\s+"bo\^.nd"\n1\s+'alpha'\n2\s+'beta'\n3\s+'gamma'/,
         "unwrap() with set_unctrl('unctrl') method call" );
 }
 
