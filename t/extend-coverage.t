@@ -283,6 +283,15 @@ select(OUT);
     $x[2] = $out->read;
     like( $x[2], qr/0\.\.2\s+'alpha'\s+'beta'\s+'gamma'/,
         "unwrap() after compactDump(1) and veryCompact(0) method calls");
+
+    my $i = Dumpvalue->new();
+    ok( $i, 'create a new Dumpvalue object' );
+    $i->compactDump(0);
+    $i->unwrap([ qw| alpha beta gamma | ]);
+    $y[2] = $out->read;
+    like( $y[1], qr/0\s+'alpha'\n1\s+'beta'\n2\s+'gamma'/,
+        "unwrap() after compactDump(0) method call");
+
 }
 
 {
