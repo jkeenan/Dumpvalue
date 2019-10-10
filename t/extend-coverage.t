@@ -13,6 +13,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use lib ("./t/lib");
 use TieOut;
 use Test::More qw(no_plan); # tests => 17;
@@ -231,18 +232,61 @@ select(OUT);
         'scalarUsage reports sum of length of hash keys and values correctly' );
 }
 
-#{
-#
-#    use warnings;
-#    my (@x, @y);
-#
-#    my $d = Dumpvalue->new( dumpReused => 1 );
-#    ok( $d, 'create a new Dumpvalue object' );
-#    #$x[0] = $d->dumpvars( 'main' );
-#    $d->dumpvars( 'main' );
-#    #print STDERR "AAA: $x[0]\n";
-#
-#}
+{
+    my (@x, @y);
+
+    my $d = Dumpvalue->new( dumpReused => 1, usageOnly => 1 );
+    ok( $d, 'create a new Dumpvalue object, usageOnly on' );
+    $d->dumpvars( 'Fake', 'veryfake' );
+    like( $out->read, qr/^String space:/, 'printed usage message fine' );
+
+    my $e = Dumpvalue->new( dumpReused => 1, usageOnly => '' );
+    ok( $e, 'create a new Dumpvalue object, usageOnly explicitly off' );
+    $e->dumpvars( 'Fake', 'veryfake' );
+    is( $out->read, '', 'printed usage message fine' );
+
+    my $f = Dumpvalue->new( dumpReused => 1, usageOnly => 1 );
+    ok( $f, 'create a new Dumpvalue object, usageOnly on' );
+    $f->dumpvars( 'main', 'INC' );
+    like( $out->read, qr/\@INC =/, 'dumped variables from a package' );
+
+    my $g = Dumpvalue->new( dumpReused => 1, usageOnly => '' );
+    ok( $g, 'create a new Dumpvalue object, usageOnly explicitly off' );
+    $g->dumpvars( 'main', 'INC' );
+    like( $out->read, qr/\@INC =/, 'dumped variables from a package' );
+
+    # return if $DB::signal and $self->{stopDbSignal};
+
+    {
+        note("DB::signal off");
+        local $DB::signal = 0;
+
+        my $h = Dumpvalue->new( dumpReused => 1, stopDbSignal => '' );
+        ok( $h, 'create a new Dumpvalue object, stopDbSignal explicitly off' );
+        $h->dumpvars( 'main', 'INC' );
+        like( $out->read, qr/\@INC =/, 'dumped variables from a package' );
+
+        my $i = Dumpvalue->new( dumpReused => 1, stopDbSignal => 1 );
+        ok( $i, 'create a new Dumpvalue object, stopDbSignal on' );
+        $i->dumpvars( 'main', 'INC' );
+        like( $out->read, qr/\@INC =/, 'dumped variables from a package' );
+    }
+
+    {
+        note("DB::signal on");
+        local $DB::signal = 1;
+
+        my $j = Dumpvalue->new( dumpReused => 1, stopDbSignal => '' );
+        ok( $j, 'create a new Dumpvalue object, stopDbSignal explicitly off' );
+        $j->dumpvars( 'main', 'INC' );
+        like( $out->read, qr/\@INC =/, 'dumped variables from a package' );
+
+        my $k = Dumpvalue->new( dumpReused => 1, stopDbSignal => 1 );
+        ok( $k, 'create a new Dumpvalue object, stopDbSignal on' );
+        $k->dumpvars( 'main', 'INC' );
+        is( $out->read, '', 'return false' );
+    }
+}
 
 {
     my (@x, @y);
@@ -296,7 +340,10 @@ select(OUT);
 }
 
 {
+    no warnings 'once';
+
     my (@x, @y);
+
     my $d = Dumpvalue->new( dumpReused => 1 );
     ok( $d, 'create a new Dumpvalue object' );
     $d->unwrap(\*BAR);
