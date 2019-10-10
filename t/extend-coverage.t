@@ -322,6 +322,16 @@ select(OUT);
     close FH or die "Unable to close tempfile after writing";
 }
 
+{
+    my (@x, @y);
+    my $d = Dumpvalue->new();
+    ok( $d, 'create a new Dumpvalue object' );
+    $d->set_unctrl('unctrl');
+    $d->unwrap([ "bo\007nd", qw| alpha beta gamma | ]);
+    $x[0] = $out->read;
+    like( $x[0], qr/0\s+"bo\^.nd"\n1\s+'alpha'\n2\s+'beta'\n3\s+'gamma'/,
+        "unwrap() with set_unctrl('unctrl') method call" );
+}
 
 __END__
     print STDERR "AAA: $x[0]\n";
