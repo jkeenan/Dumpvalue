@@ -90,6 +90,28 @@ select(OUT);
     ok( $i, 'create a new Dumpvalue object: quoteHighBit on, tick quote' );
     $y[2] = $i->stringify("\N{U+266}");
     is( $y[2], q|"\1146"|, "quoteHighBit on");
+
+    my $j = Dumpvalue->new( dumpReused => 1, quoteHighBit => 1, unctrl => 'quote' );
+    ok( $j, 'create a new Dumpvalue object: quoteHighBit on' );
+    $x[3] = $j->stringify("abc");
+    is( $x[3], q|'abc'|, "quoteHighBit on, unctrl quote, asciii-only text");
+
+    my $k = Dumpvalue->new( dumpReused => 1, quoteHighBit => 1, unctrl => 'unctrl' );
+    ok( $k, 'create a new Dumpvalue object: quoteHighBit on' );
+    $y[3] = $k->stringify("\N{U+266}abc");
+    is( $y[3], q|'\1146abc'|, "quoteHighBit on, unctrl unctrl, mixed text");
+
+    my $l = Dumpvalue->new( dumpReused => 1, quoteHighBit => '', unctrl => 'quote' );
+    ok( $l, 'create a new Dumpvalue object: quoteHighBit off' );
+    $x[4] = $l->stringify("abc");
+    is( $x[4], q|'abc'|, "quoteHighBit off, unctrl quote, asciii-only text");
+
+    my $m = Dumpvalue->new( dumpReused => 1, quoteHighBit => '', unctrl => 'unctrl' );
+    ok( $m, 'create a new Dumpvalue object: quoteHighBit off' );
+    $y[4] = $m->stringify("\N{U+266}abc");
+    #is( $y[4], q|'\1146abc'|, "quoteHighBit off, unctrl unctrl, mixed text");
+    is( $y[4], qq|'\N{U+266}abc'|, "quoteHighBit off, unctrl unctrl, mixed text");
+
 }
 
 {
@@ -285,6 +307,11 @@ select(OUT);
         ok( $k, 'create a new Dumpvalue object, stopDbSignal on' );
         $k->dumpvars( 'main', 'INC' );
         is( $out->read, '', 'return false' );
+
+        my $l = Dumpvalue->new( dumpReused => 1, stopDbSignal => 1 );
+        ok( $l, 'create a new Dumpvalue object, stopDbSignal on' );
+        $l->dumpvars( 'main::', 'INC' );
+        is( $out->read, '', 'XXX: return false' );
     }
 }
 
@@ -388,6 +415,26 @@ select(OUT);
     $x[1] = $out->read;
     like( $x[1], qr/0\s+"bo\^.nd"\n1\s+'alpha'\n2\s+'beta'\n3\s+'gamma'/,
         "unwrap() with set_unctrl('unctrl') method call" );
+}
+
+{
+    my (@x, @y);
+
+    my $d = Dumpvalue->new( dumpReused => 1 );
+    ok( $d, 'create a new Dumpvalue object' );
+    $x[0] = $d->dumpsub( '', 'TieOut::read' );
+    like( $x[0], qr/&TieOut::read in/, 'dumpsub found sub fine' );
+
+    my $e = Dumpvalue->new( dumpReused => 1 );
+    ok( $e, 'create a new Dumpvalue object' );
+    $y[0] = $e->dumpsub( 5, 'TieOut::read' );
+    like( $y[0], qr/\s{5}&TieOut::read in/, 'dumpsub found sub fine, leading whitespace' );
+
+    my $f = Dumpvalue->new( dumpReused => 1 );
+    ok( $f, 'create a new Dumpvalue object' );
+    $x[1] = $f->dumpsub( '', "{*ABC}" );
+    like( $x[1], qr/&ABC in \?{3}/, 'dumpsub found sub (ref) fine' );
+
 }
 
 __END__
