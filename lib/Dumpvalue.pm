@@ -432,13 +432,15 @@ sub dumpvars {
   $self->{TotalStrings} = 0;
   $self->{Strings} = 0;
   $self->{CompleteTotal} = 0;
-  while (($key,$val) = each(%stab)) {
+  for my $k (keys %stab) {
+    $key = $k;
+    $val = $stab{$k};
     return if $DB::signal and $self->{stopDbSignal};
     next if @vars && !grep( matchvar($key, $_), @vars );
     if ($self->{usageOnly}) {
       $self->globUsage(\$val, $key)
-	if ($package ne 'Dumpvalue' or $key ne 'stab')
-	   and ref(\$val) eq 'GLOB';
+        if ($package ne 'Dumpvalue' or $key ne 'stab')
+          and ref(\$val) eq 'GLOB';
     } else {
       $self->dumpglob($package, 0,$key, $val);
     }
